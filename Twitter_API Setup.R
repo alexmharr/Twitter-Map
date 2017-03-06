@@ -1,18 +1,43 @@
-library(devtools)
-install_github("twitteR", username="geoffjentry")
-library(twitteR)
-library(base64enc)
 
-api_key <- "xxxxx"
+library(streamR)
+library(RCurl)
+library(RJSONIO)
+library(stringr)
+#the code below is used to connect the twitter api
+library(ROAuth)
+requestURL <- "https://api.twitter.com/oauth/request_token"
+accessURL <- "https://api.twitter.com/oauth/access_token"
+authURL <- "https://api.twitter.com/oauth/authorize"
+consumerKey <- "APMnFSmvPJ56HLqRlO957IpNa"
+consumerSecret <- "6Ra0pjhVcqQl64ArBrQtY6jUCraqJYrLA9bTs9MmFv7no3V8Zp"
 
-api_secret <- "xxxxx"
+my_oauth <- OAuthFactory$new(consumerKey = consumerKey,
+                             consumerSecret = consumerSecret,
+                             requestURL = requestURL,
+                             accessURL = accessURL,
+                             authURL = authURL)
 
-token <- "xxxxx"
+my_oauth$handshake(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))
+save(my_oauth, file = "my_oauth.Rdata")
 
-token_secret <- "xxxxx"
+tweets_geolocated <- searchTwitter("#", n=100, lang="en", geocode='34.04993,-118.24084,50mi', since="2014-08-20")
+tweets_geoolocated.df <- twListToDF(tweets_geolocated)
+#use to collect tweets base on location
+load("my_oauth.Rdata")
+filterStream(file.name = "tweets.json", # Save tweets in a json file
+             track = c("#"), # Collect tweets mentioning either Affordable Care Act, ACA, or Obamacare
+             language = "en",
+             location  = c(-119, 33, -117, 35),
+             timeout = 60, 
+             oauth = my_oauth) # Use my_oauth file as the OAuth credentials
 
-setup_twitter_oauth(api_key,api_secret,token, token_secret)
+tweets.df <- parseTweets("tweets.json", simplify = FALSE)
+#extract only the hashtags
+textScrubber <- function(dataframe) {
+  dataframe$text <-  str_extract(dataframe$text,"#\\S+")
+  return(dataframe)
+}
+View(tweets.df)
 
-search.string <- "#nba"
-no.of.tweets <- 100
-tweets <- searchTwitter(search.string, n = no.of.tweets, lang = "en")
+tweets.df <- textScrubber(tweets.df)
+
