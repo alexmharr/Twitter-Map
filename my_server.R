@@ -55,7 +55,7 @@ my.server <- function(input, output) {
   data$interest <- ""
   output$interest.table <- renderTable({
     #this csv is from 'fanpagelist.com/category/top_users/view/list/sort/followers/', not an api.
-    top100.user <- read.csv("./top100 twitter user.csv")
+    top100.user <- read.csv("top100 twitter user.csv")
     if (input$tweet_interest == "Entertainer"){
       data$interest <- input$Entertainer_interest
     }
@@ -66,4 +66,3 @@ my.server <- function(input, output) {
   observeEvent(input$tweet_interest, {data$interest <- input$tweet_interest})
 
 }
-
