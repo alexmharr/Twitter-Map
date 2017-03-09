@@ -50,5 +50,20 @@ my.server <- function(input, output) {
     # returning message for tables
     return(table.message)
   })
+  #storing reactive Values  here
+  data <- reactiveValues()
+  data$interest <- ""
+  output$interest.table <- renderTable({
+    #this csv is from 'fanpagelist.com/category/top_users/view/list/sort/followers/', not an api.
+    top100.user <- read.csv("./top100 twitter user.csv")
+    if (input$tweet_interest == "Entertainer"){
+      data$interest <- input$Entertainer_interest
+    }
+    #filtering the table with the reactive values
+    top100.category <- top100.user[grep(data$interest, top100.user$Categories),]
+  })
+  
+  observeEvent(input$tweet_interest, {data$interest <- input$tweet_interest})
+
 }
 

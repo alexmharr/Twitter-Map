@@ -33,19 +33,36 @@ my.ui <- fluidPage(
                   max = 20),
       br(),
       
-      em(p("Kelvin's Thingy Options"))
+
+      em(p("Twitter's Interest")),
       
+      #Categories that can describe different types of Twitter users
+      selectInput("tweet_interest", "Your Interest?", 
+                  c("Athlete" = "Athlete", "Brand" = "Brand", "Entertainer",
+                    "Executive" = "Executive", "Media" = "Media", "Organization" = "Organization",
+                    "Politician" = "Politician", "Sports Team"= "Sports Team", "Technology" = "Technology")
+                  ),
+      #if it is Entertainer, this will pop up.
+      conditionalPanel(
+        condition = "input.tweet_interest == 'Entertainer'",
+        selectInput("Entertainer_interest", "What type?", 
+                    c("Comedian" = "Comedian", 
+                      "Musician" = "Musician", "Reality Star" = "Reality Star", "TV Host" = "TV Host")
+        )
+      )
       ),
     
     # making the main panel
     mainPanel(
-      
+
       # creating the tabs
       tabsetPanel(type = "tabs",
                   tabPanel("Map"), 
                   tabPanel("Search", strong(p(textOutput('message'))), tableOutput("table")), 
-                  tabPanel("Kelvin's Thing")
+                  tabPanel("Interest", tableOutput("interest.table"))
+
       )
     )
   )
 )
+
