@@ -9,7 +9,7 @@ library(twitteR)
 library(ggmap)
 library(shiny)
 library(htmltools)
-
+library(rsconnect)
 american_results <- read.csv("american_results", stringsAsFactors = FALSE)
 
 ui <- navbarPage(
@@ -27,7 +27,8 @@ ui <- navbarPage(
              mainPanel(
                h1("Introducing Twitter Analysis"),
                p("Twitter Analysis is an application that allows you to",strong("search, view, and see popular"),
-               "tweets and accounts"),
+               "tweets and accounts. This provides a useful tool for prospective University of Washington students to see 
+               where everyone lives, and also maintain a social aspect of staying up to date with the latest tweets"),
                br(),
                br(),
                img(src = "TwitterLogo.png", height = 500, width = 500)
@@ -42,6 +43,10 @@ ui <- navbarPage(
         selectInput("markers", label = "Choose a marker display", choices = c("Markers" ,"Circles"))
       ),
       mainPanel(
+        h2("University Of Washington Follower Locations"),
+        br(),
+        p("The map below showcases the location of different University of Washington Followers"),
+        p(""),
         leafletOutput("map")
       )
     )
@@ -58,13 +63,19 @@ ui <- navbarPage(
         textInput('search', label = "Search Box:"),
         sliderInput('tweets', 
                     "Number of Tweets Displayed:", 
-                    value = 10,
+                    value = 2,
                     min = 1, 
-                    max = 20)
+                    max = 5)
       ),
       mainPanel(
-        strong(p(textOutput('message'))),
-        tableOutput("table")
+        h2("Twitter Search"),
+        p("This section of our app lets the user search the Twitter API for both specific users and trends. 
+          The user is also given the option of how many results they want to be displayed.  
+          Depending on which options the user selects, the server will run through the Twitter API,
+          convert the resulting data list into a dataframe, select the relevant columns, 
+          and finally display the results to the user."),
+        tableOutput("table"),
+        em(p(textOutput('message')))
       )
     )
   ),
@@ -89,6 +100,11 @@ ui <- navbarPage(
         )
       ),
       mainPanel(
+        h2("Search for top accounts to follow based on your interest"),
+        br(),
+        p("Based off of a fanpage list, we were able to take the top 100 accounts on twitter.
+          Then we separated the twitter users into different categories.
+          The user of our app can search the top accounts on twitter based on these categories/interests."),
         tableOutput("interest.table")
       )
     )

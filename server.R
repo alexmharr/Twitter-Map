@@ -9,9 +9,11 @@ library(twitteR)
 library(ggmap)
 library(shiny)
 library(htmltools)
+library(rsconnect)
 
-#setup_twitter_oauth("APMnFSmvPJ56HLqRlO957IpNa", "6Ra0pjhVcqQl64ArBrQtY6jUCraqJYrLA9bTs9MmFv7no3V8Zp", 
-                    #"2340813607-fJqGczp5N7NhyrcGfoMR8Hx0yEc3UhOO5x4eJOh", "x7Ty5DTPxnBnMcXcwy3KP2vX4inB3UnNqsk0h6bjtzJoO")
+
+setup_twitter_oauth("APMnFSmvPJ56HLqRlO957IpNa", "6Ra0pjhVcqQl64ArBrQtY6jUCraqJYrLA9bTs9MmFv7no3V8Zp", 
+                    "2340813607-fJqGczp5N7NhyrcGfoMR8Hx0yEc3UhOO5x4eJOh", "x7Ty5DTPxnBnMcXcwy3KP2vX4inB3UnNqsk0h6bjtzJoO")
 american_results <- read.csv("american_results", stringsAsFactors = FALSE)
 server <- function(input, output) {
   
@@ -81,29 +83,29 @@ server <- function(input, output) {
     }
     
     if(input$type=='a'){
-      search.type <- "from:"
+     search.type <- "from:"
     }
-    if(input$type=='b'){
+    else {
      search.type <- "#"
     }
     
-    search.string <- paste(search.type, input$search, sep = "")
+    search.string <- paste0(search.type, input$search)
     no.of.tweets <- input$tweets
-    #tweets <- searchTwitter(search.string, n = no.of.tweets, lang = "en", resultType = result.type)
-    #tweetsDF <- twListToDF(tweets)
-    #tweetsDF <- select(tweetsDF, screenName, text, created, retweetCount, favoriteCount)
-    #names(tweetsDF$screenName) <- "Twitter Handle"
-    #names(tweetsDF$text) <- "Text"
-    #names(tweetsDF$created) <- "Date Created"
-    #names(tweetsDF$retweetCount) <- "Number of Retweets"
-    #names(tweetsDF$favoriteCount) <- "Number of Favorites"
+    tweets <- searchTwitter(search.string, n = no.of.tweets, lang = "en", resultType = result.type)
+    tweetsDF <- twListToDF(tweets)
+    tweetsDF <- select(tweetsDF, screenName, text, created, retweetCount, favoriteCount)
+    names(tweetsDF$screenName) <- "Twitter Handle"
+    names(tweetsDF$text) <- "Text"
+    names(tweetsDF$created) <- "Date Created"
+    names(tweetsDF$retweetCount) <- "Number of Retweets"
+    names(tweetsDF$favoriteCount) <- "Number of Favorites"
     
     #displaying table results
-    #return(tweetsDF)
+    return(tweetsDF)
   })
   
   output$message <- renderText({
-    table.message <- "Results displayed from the last week"
+    table.message <- "*Results displayed from the last week"
     #returning message for tables
    return(table.message)
   })
