@@ -8,7 +8,8 @@ library(leaflet)
 library(twitteR)
 library(ggmap)
 library(htmltools)
-
+setup_twitter_oauth("APMnFSmvPJ56HLqRlO957IpNa", "6Ra0pjhVcqQl64ArBrQtY6jUCraqJYrLA9bTs9MmFv7no3V8Zp", 
+                    "2340813607-fJqGczp5N7NhyrcGfoMR8Hx0yEc3UhOO5x4eJOh", "x7Ty5DTPxnBnMcXcwy3KP2vX4inB3UnNqsk0h6bjtzJoO")
 
 state <- map("state", fill = TRUE, plot = FALSE)
 american_results <- read.csv("Data/american_results", stringsAsFactors = FALSE)
@@ -23,6 +24,7 @@ row.names(names) <- NULL
 
 american_results$screenName <- names$screenName
 american_results$friends <- names$friendsCount
+write.csv(american_results, "american_results")
 
 
 getColor <- function(df) {

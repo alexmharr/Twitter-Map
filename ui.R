@@ -10,8 +10,9 @@ library(ggmap)
 library(shiny)
 library(htmltools)
 
+american_results <- read.csv("american_results", stringsAsFactors = FALSE)
 
-my.ui <- navbarPage(
+ui <- navbarPage(
   title = "Twitter Analysis",
   tabPanel("Welcome",
            sidebarLayout(
@@ -95,8 +96,5 @@ my.ui <- navbarPage(
 )
 
 
-my.server <- function(input, output) {
-  
-}
 
-shinyApp(my.ui, my.server)
+shinyServer(ui)
