@@ -3,13 +3,58 @@ library("ggplot2")
 library("dplyr")
 library("twitteR")
 library("ROAuth")
+source("interactive_map.R")
 
 setup_twitter_oauth("APMnFSmvPJ56HLqRlO957IpNa", "6Ra0pjhVcqQl64ArBrQtY6jUCraqJYrLA9bTs9MmFv7no3V8Zp", 
                     "2340813607-fJqGczp5N7NhyrcGfoMR8Hx0yEc3UhOO5x4eJOh", "x7Ty5DTPxnBnMcXcwy3KP2vX4inB3UnNqsk0h6bjtzJoO")
 
 # creating the server
 my.server <- function(input, output) {
-
+  
+  total <- reactive({
+    followers <- american_results %>% 
+      sample_n(input$obs)
+    return(followers)
+  })
+  
+  radius <- reactive({
+    getRadius <- function(df) {
+      sapply(df$friends, function(friends) {
+        if(friends <= 100) {
+          2
+        } else if(friends > 100 & friends <= 500) {
+          3
+        } else if(friends > 500 & friends <= 1000) {
+          5
+        } else if(friends > 1000 & friends <= 2000) {
+          6
+        } else if(friends > 2000) {
+          7
+        } else {
+          8
+        } })
+    }
+    getRadius(total())
+  })
+  
+  friends <- reactive({
+    total()$friends
+  })
+  
+  output$map <- renderLeaflet({
+    binPal <- colorQuantile("Blues", total()$friends, n = 7)
+    l <- leaflet() %>%
+      addTiles() %>% 
+      addProviderTiles(providers$Esri.WorldStreetMap) %>% 
+      setView(lng = -98.35, lat = 39.5, zoom = 3)
+    if(input$markers == "Markers") {
+      l <- l %>% addMarkers(data = total(), lng = ~lng, lat = ~lat, label = ~htmlEscape(screenName))
+    } else {
+      l <- l %>%  addCircleMarkers(data = total(), radius = radius(), color = binPal(friends()), stroke = FALSE, fillOpacity = 0.5)
+    }
+    return(l)
+  })
+  
   # determining options for table
   output$table <- renderTable({
     
@@ -66,3 +111,5 @@ my.server <- function(input, output) {
   observeEvent(input$tweet_interest, {data$interest <- input$tweet_interest})
 
 }
+shinyServer(my.server)
+

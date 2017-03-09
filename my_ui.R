@@ -1,7 +1,7 @@
 library("shiny")
 library("ggplot2")
 library("dplyr")
-
+source("interactive_map.R")
 # creating the ui
 my.ui <- fluidPage(
 
@@ -42,6 +42,8 @@ my.ui <- fluidPage(
                     "Executive" = "Executive", "Media" = "Media", "Organization" = "Organization",
                     "Politician" = "Politician", "Sports Team"= "Sports Team", "Technology" = "Technology")
                   ),
+      sliderInput("obs", label = "Number of Followers", min = 25, max = nrow(american_results), value = nrow(american_results)/2),
+      selectInput("markers", label = "Choose a marker display", choices = c("Markers" ,"Circles")), 
       #if it is Entertainer, this will pop up.
       conditionalPanel(
         condition = "input.tweet_interest == 'Entertainer'",
@@ -50,14 +52,14 @@ my.ui <- fluidPage(
                       "Musician" = "Musician", "Reality Star" = "Reality Star", "TV Host" = "TV Host")
         )
       )
-      ),
+    ),
     
     # making the main panel
     mainPanel(
 
       # creating the tabs
       tabsetPanel(type = "tabs",
-                  tabPanel("Map"), 
+                  tabPanel("Map", leafletOutput("map")), 
                   tabPanel("Search", strong(p(textOutput('message'))), tableOutput("table")), 
                   tabPanel("Interest", tableOutput("interest.table"))
 
@@ -65,4 +67,4 @@ my.ui <- fluidPage(
     )
   )
 )
-
+shinyUI(my.ui)
